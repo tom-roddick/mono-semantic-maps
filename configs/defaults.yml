@@ -1,0 +1,155 @@
+
+
+### Training options ###
+
+# IDs of GPUs to use during training
+gpus: [0, 2, 3, 4]
+
+# Number of examples per mini-batch
+batch_size: 12
+
+# Number of dataloader threads
+num_workers: 8
+
+# Learning rate
+learning_rate: 0.1
+
+# Decay learning rate by a factor 10 after the following number of epochs
+lr_milestones: [150, 185]
+
+# Weight decay
+weight_decay: 0.0001
+
+# Directory to save experiment to
+logdir: logs
+
+# Number of epochs to train for
+num_epochs: 200
+
+# Number of examples per epoch
+epoch_size: 50000
+
+
+#### Data options ####
+
+# Dataset to train on
+train_dataset: nuscenes
+
+# Name of split used for training
+train_split: train
+
+# Name of split used for validation
+val_split: val
+
+# Root data directory 
+dataroot: ${DATA_ROOT}/nuscenes
+
+# NuScenes dataset version
+nuscenes_version: v1.0-trainval
+
+# Directory containing pregenerated training labels
+label_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
+
+# Input image size after downsampling
+img_size: [800, 600]
+
+# Class-specific weighting factors used to balance the cross entropy loss
+class_weights:
+  -    1.7    # drivable_area
+  -    5.9    # ped_crossing
+  -    3.3    # walkway
+  -    4.6    # carpark
+  -    8.0    # car
+  -   10.3    # truck
+  -   10.6    # bus
+  -    6.9    # trailer
+  -   11.8    # construction_vehicle
+  -   30.1    # pedestrian
+  -   33.6    # motorcycle
+  -   41.2    # bicycle
+  -   44.3    # traffic_cone
+  -   15.9    # barrier
+
+# Whether to use horizontal flips for data augmentation
+hflip: True
+
+# Top-left and bottom right coordinates of map region, in meters
+map_extents: [-25., 1., 25., 50.]
+
+# Spacing between adjacent grid cells in the map, in meters
+map_resolution: 0.25
+
+# Log loss to tensorboard every N iterations
+log_interval: 10
+
+
+### Model options ###
+
+# Architecture to train [pyramid | ved | vpn ]
+model: pyramid
+
+# Number of intermediate channels in the transformer layer
+tfm_channels: 64
+
+# Vertical extents of the region of interest, in meters
+ymin: -2
+ymax: 4
+
+# Approximate camera focal length used for constructing transformers
+focal_length: 630.
+
+# Topdown network options
+topdown:
+
+  # Number of feature channels at each layer of the topdown network
+  channels: 128
+
+  # Number of blocks in each layer
+  layers: [4, 4]
+
+  # Upsampling factor in each stage of the topdown network
+  strides: [1, 2]
+
+  # Type of residual block to use [ basic | bottleneck ]
+  blocktype: bottleneck
+
+# Number of output classes to predict
+num_class: 14
+
+# Prior probability of a positive prediction, used to initialise classifier
+prior: 0.01
+
+# View parsing network options
+vpn:
+
+  # Size of output feature maps
+  output_size: [29, 50]
+
+  # Number of channels in fully connected layer
+  fc_dim: 256
+
+# Variational encoder-decoder network options
+ved:
+
+  # Dimensions of bottleneck (depends on the size of input images)
+  bottleneck_dim: 18
+
+
+# Binary cross entropy loss weight
+xent_weight: 1.0
+
+# Max entropy uncertainty loss weight
+uncert_weight: 0.001
+
+# KL-Divergence loss weight (used by VED network)
+kld_weight: 0.0
+
+# Threshold to treat prediction as positive
+score_thresh: 0.5
+
+
+
+
+
+
+

@@ -1,0 +1,19 @@
+train_dataset: argoverse
+dataroot: ${DATA_ROOT}/argoverse/argoverse-tracking
+label_root: ${PROCESSED_ROOT}/argoverse/test
+img_size: [960, 600]
+class_weights:
+      -  1.7    # drivable_area
+      -  5.2    # vehicle
+      - 22.0    # pedestrian
+      -  9.6    # large_vehicle
+      - 20.3    # bicycle
+      -  9.6    # bus
+      -  7.0    # trailer
+      - 27.5    # motorcycle
+
+vpn:
+  output_size : [38, 60]
+
+ved:
+  bottleneck_dim: 28

@@ -1,0 +1,4 @@
+model: ved
+xent_weight: 0.9
+uncert_weight: 0.001
+kld_weight: 0.1

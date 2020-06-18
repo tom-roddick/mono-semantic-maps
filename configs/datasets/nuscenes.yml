@@ -1,0 +1,27 @@
+train_dataset: nuscenes
+dataroot: ${DATA_ROOT}/nuscenes
+nuscenes_version: v1.0-trainval
+label_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
+img_size: [800, 600]
+num_class: 14
+class_weights:
+  -    1.7    # drivable_area
+  -    5.9    # ped_crossing
+  -    3.3    # walkway
+  -    4.6    # carpark
+  -    8.0    # car
+  -   10.3    # truck
+  -   10.6    # bus
+  -    6.9    # trailer
+  -   11.8    # construction_vehicle
+  -   30.1    # pedestrian
+  -   33.6    # motorcycle
+  -   41.2    # bicycle
+  -   44.3    # traffic_cone
+  -   15.9    # barrier
+
+ved:
+  bottleneck_dim: 18
+
+vpn:
+  output_size : [29, 50]
