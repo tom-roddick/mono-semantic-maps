@@ -82,6 +82,9 @@ map_resolution: 0.25
 # Log loss to tensorboard every N iterations
 log_interval: 10
 
+# Visualise predictions every N iterations
+vis_interval: 200
+
 
 ### Model options ###
 
@@ -118,6 +121,12 @@ num_class: 14
 
 # Prior probability of a positive prediction, used to initialise classifier
 prior: 0.01
+
+# Whether to use Bayesian classifier
+bayesian: False
+
+# Number of samples used for Monte-Carlo inference
+mc_samples: 40
 
 # View parsing network options
 vpn:

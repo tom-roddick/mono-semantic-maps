@@ -55,11 +55,16 @@ def train(dataloader, model, criterion, optimiser, summary, config, epoch):
         if i % config.log_interval == 0:
             summary.add_scalar('train/loss', float(loss), iteration)
 
+        # Visualise
+        if i % config.vis_interval == 0:
+            visualise(summary, image, scores, labels, mask, iteration, 
+                      config.train_dataset, split='train')
+                
         iteration += 1
 
     # Print and record results
-    display_results(confusion, config.dataset)
-    log_results(confusion, config.dataset, summary, 'train', epoch)
+    display_results(confusion, config.train_dataset)
+    log_results(confusion, config.train_dataset, summary, 'train', epoch)
 
 
 
@@ -79,12 +84,13 @@ def evaluate(dataloader, model, criterion, summary, config, epoch):
         
         # Predict class occupancy scores and compute loss
         image, calib, labels, mask = batch
-        if config.model == 'ved':
-            logits, mu, logvar = model(image)
-            loss = criterion(logits, labels, mask, mu, logvar)
-        else:
-            logits = model(image, calib)
-            loss = criterion(logits, labels, mask)
+        with torch.no_grad():
+            if config.model == 'ved':
+                logits, mu, logvar = model(image)
+                loss = criterion(logits, labels, mask, mu, logvar)
+            else:
+                logits = model(image, calib)
+                loss = criterion(logits, labels, mask)
 
         # Update confusion matrix
         scores = logits.sigmoid()
@@ -92,16 +98,34 @@ def evaluate(dataloader, model, criterion, summary, config, epoch):
 
         # Update tensorboard
         if i % config.log_interval == 0:
-            summary.add_scalar('val/loss', float(loss), iteration)
-
-        iteration += 1
+            summary.add_scalar('val/loss', float(loss), epoch)
+        
+        # Visualise
+        if i % config.vis_interval == 0:
+            visualise(summary, image, scores, labels, mask, epoch, 
+                      config.train_dataset, split='val')
 
     # Print and record results
-    display_results(confusion, config.dataset)
-    log_results(confusion, config.dataset, summary, 'val', epoch)
+    display_results(confusion, config.train_dataset)
+    log_results(confusion, config.train_dataset, summary, 'val', epoch)
 
     return confusion.mean_iou
 
+
+def visualise(summary, image, scores, labels, mask, step, dataset, split):
+
+    class_names = NUSCENES_CLASS_NAMES if dataset == 'nuscenes' \
+        else ARGOVERSE_CLASS_NAMES
+
+    summary.add_image(split + '/image', image[0], step, dataformats='CHW')
+    
+    for i, name in enumerate(class_names):
+        summary.add_image(split + '/pred/' + name, scores[0, i], step, 
+                          dataformats='HW')
+        summary.add_image(split + '/gt/' + name, labels[0, i], step, 
+                          dataformats='HW')
+    
+    summary.add_image(split + '/mask', mask[0], step, dataformats='HW')
 
 
 def display_results(confusion, dataset):
@@ -176,6 +200,9 @@ def get_configuration(args):
     # Load model options
     config.merge_from_file(f'configs/models/{args.model}.yml')
 
+    # Load experiment options
+    config.merge_from_file(f'configs/experiments/{args.experiment}.yml')
+
     # Restore config from an existing experiment
     if args.resume is not None:
         config.merge_from_file(os.path.join(args.resume, 'config.yml'))
@@ -227,6 +254,8 @@ def main():
                         default='nuscenes', help='dataset to train on')
     parser.add_argument('--model', choices=['pyramid', 'vpn', 'ved'],
                         default='pyramid', help='model to train')
+    parser.add_argument('--experiment', default='test', 
+                        help='name of experiment config to load')
     parser.add_argument('--resume', default=None, 
                         help='path to an experiment to resume')
     parser.add_argument('--options', nargs='*', default=[],
@@ -265,7 +294,10 @@ def main():
 
     # Main training loop
     while epoch <= config.num_epochs:
-
+        
+        print('\n\n=== Beginning epoch {} of {} ==='.format(epoch, 
+                                                            config.num_epochs))
+        
         # Train model for one epoch
         train(train_loader, model, criterion, optimiser, summary, config, epoch)
 
@@ -283,6 +315,8 @@ def main():
         
         save_checkpoint(os.path.join(logdir, 'latest.pth'), model, optimiser, 
                         lr_scheduler, epoch, best_iou)
+        
+        epoch += 1
     
     print("\nTraining complete!")
 

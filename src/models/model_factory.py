@@ -11,6 +11,7 @@ from .criterion import OccupancyCriterion, VaeOccupancyCriterion
 from ..nn.fpn import FPN50
 from ..nn.topdown import TopdownNetwork
 from ..nn.pyramid import TransformerPyramid
+from ..nn.classifier import LinearClassifier, BayesianClassifier
 
 
 
@@ -68,12 +69,12 @@ def build_pyramid_occupancy_network(config):
                              config.topdown.blocktype)
     
     # Build classifier
-    classifier = nn.Conv2d(topdown.out_channels, config.num_class, 1)
+    if config.bayesian:
+        classifier = BayesianClassifier(topdown.out_channels, config.num_class)
+    else:
+        classifier = LinearClassifier(topdown.out_channels, config.num_class)
+    classifier.initialise(config.prior)
     
-    # Initialise with prior probability
-    classifier.weight.data.zero_()
-    classifier.bias.data.fill_(-math.log((1 - config.prior) / config.prior))
-
     # Assemble Pyramid Occupancy Network
     return PyramidOccupancyNetwork(frontend, transformer, topdown, classifier)
 
