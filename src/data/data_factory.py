@@ -4,7 +4,7 @@ from .augmentation import AugmentedMapDataset
 
 from nuscenes import NuScenes
 from .nuscenes.dataset import NuScenesMapDataset
-from .nuscenes.splits import TRAIN_SCENES, VAL_SCENES
+from .nuscenes.splits import TRAIN_SCENES, VAL_SCENES, CALIBRATION_SCENES
 
 from argoverse.data_loading.argoverse_tracking_loader \
     import ArgoverseTrackingLoader
@@ -17,8 +17,14 @@ def build_nuscenes_datasets(config):
     nuscenes = NuScenes(config.nuscenes_version, 
                         os.path.expandvars(config.dataroot))
     
+    # Exclude calibration scenes
+    if config.hold_out_calibration:
+        train_scenes = list(set(TRAIN_SCENES) - set(CALIBRATION_SCENES))
+    else:
+        train_scenes = TRAIN_SCENES
+    
     train_data = NuScenesMapDataset(nuscenes, config.label_root, 
-                                    config.img_size, TRAIN_SCENES)
+                                    config.img_size, train_scenes)
     val_data = NuScenesMapDataset(nuscenes, config.label_root, 
                                   config.img_size, VAL_SCENES)
     return train_data, val_data

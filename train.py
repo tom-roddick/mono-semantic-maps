@@ -16,10 +16,15 @@ from src.utils.configs import get_default_configuration, load_config
 from src.utils.confusion import BinaryConfusionMatrix
 from src.data.nuscenes.utils import NUSCENES_CLASS_NAMES
 from src.data.argoverse.utils import ARGOVERSE_CLASS_NAMES
+from src.utils.visualise import colorise
 
 def train(dataloader, model, criterion, optimiser, summary, config, epoch):
 
     model.train()
+
+    # Compute prior probability of occupancy
+    prior = torch.tensor(config.prior)
+    prior_log_odds = torch.log(prior / (1 - prior))
 
     # Initialise confusion matrix
     confusion = BinaryConfusionMatrix(config.num_class)
@@ -48,7 +53,7 @@ def train(dataloader, model, criterion, optimiser, summary, config, epoch):
         optimiser.step()
 
         # Update confusion matrix
-        scores = logits.sigmoid()
+        scores = logits.cpu().sigmoid()  
         confusion.update(scores > config.score_thresh, labels, mask)
 
         # Update tensorboard
@@ -72,6 +77,10 @@ def evaluate(dataloader, model, criterion, summary, config, epoch):
 
     model.eval()
 
+    # Compute prior probability of occupancy
+    prior = torch.tensor(config.prior)
+    prior_log_odds = torch.log(prior / (1 - prior))
+
     # Initialise confusion matrix
     confusion = BinaryConfusionMatrix(config.num_class)
     
@@ -93,7 +102,7 @@ def evaluate(dataloader, model, criterion, summary, config, epoch):
                 loss = criterion(logits, labels, mask)
 
         # Update confusion matrix
-        scores = logits.sigmoid()
+        scores = logits.cpu().sigmoid()  
         confusion.update(scores > config.score_thresh, labels, mask)
 
         # Update tensorboard
@@ -118,14 +127,19 @@ def visualise(summary, image, scores, labels, mask, step, dataset, split):
         else ARGOVERSE_CLASS_NAMES
 
     summary.add_image(split + '/image', image[0], step, dataformats='CHW')
+    summary.add_image(split + '/pred', colorise(scores[0], 'coolwarm', 0, 1),
+                      step, dataformats='NHWC')
+    summary.add_image(split + '/gt', colorise(labels[0], 'coolwarm', 0, 1),
+                      step, dataformats='NHWC')
+
     
-    for i, name in enumerate(class_names):
-        summary.add_image(split + '/pred/' + name, scores[0, i], step, 
-                          dataformats='HW')
-        summary.add_image(split + '/gt/' + name, labels[0, i], step, 
-                          dataformats='HW')
+    # for i, name in enumerate(class_names):
+    #     summary.add_image(split + '/pred/' + name, scores[0, i], step, 
+    #                       dataformats='HW')
+    #     summary.add_image(split + '/gt/' + name, labels[0, i], step, 
+    #                       dataformats='HW')
     
-    summary.add_image(split + '/mask', mask[0], step, dataformats='HW')
+    # summary.add_image(split + '/mask', mask[0], step, dataformats='HW')
 
 
 def display_results(confusion, dataset):

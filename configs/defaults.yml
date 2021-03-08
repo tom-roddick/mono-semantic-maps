@@ -53,6 +53,9 @@ label_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
 # Input image size after downsampling
 img_size: [800, 600]
 
+# Hold out portion of train data to calibrate on
+hold_out_calibration: False
+
 # Class-specific weighting factors used to balance the cross entropy loss
 class_weights:
   -    1.7    # drivable_area
@@ -69,6 +72,23 @@ class_weights:
   -   41.2    # bicycle
   -   44.3    # traffic_cone
   -   15.9    # barrier
+
+# Prior probability of a positive prediction, used to initialise classifier
+prior: 
+  - 0.44679   # drivable_area
+  - 0.02407   # ped_crossing
+  - 0.14491   # walkway
+  - 0.02994   # carpark
+  - 0.02086   # car
+  - 0.00477   # truck
+  - 0.00156   # bus
+  - 0.00189   # trailer
+  - 0.00084   # construction_vehicle
+  - 0.00119   # pedestrian
+  - 0.00019   # motorcycle
+  - 0.00012   # bicycle
+  - 0.00031   # traffic_cone
+  - 0.00176   # barrier
 
 # Whether to use horizontal flips for data augmentation
 hflip: True
@@ -119,9 +139,6 @@ topdown:
 # Number of output classes to predict
 num_class: 14
 
-# Prior probability of a positive prediction, used to initialise classifier
-prior: 0.01
-
 # Whether to use Bayesian classifier
 bayesian: False
 
@@ -143,6 +160,8 @@ ved:
   # Dimensions of bottleneck (depends on the size of input images)
   bottleneck_dim: 18
 
+# Loss function
+loss_fn: bce
 
 # Binary cross entropy loss weight
 xent_weight: 1.0
@@ -150,8 +169,16 @@ xent_weight: 1.0
 # Max entropy uncertainty loss weight
 uncert_weight: 0.001
 
+# Focal loss parameters
+focal:
+  alpha: 0.25
+  gamma: 2
+
 # KL-Divergence loss weight (used by VED network)
 kld_weight: 0.0
+
+# Method of weighting classes in loss function
+weight_mode: sqrt_inverse
 
 # Threshold to treat prediction as positive
 score_thresh: 0.5

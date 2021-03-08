@@ -21,5 +21,34 @@ def uncertainty_loss(x, mask):
     return 1. + entropy.mean() / INV_LOG2
 
 
+def prior_uncertainty_loss(x, mask, priors):
+    priors = x.new(priors).view(1, -1, 1, 1).expand_as(x)
+    xent = F.binary_cross_entropy_with_logits(x, priors, reduce=False)
+    return (xent * (~mask).float().unsqueeze(1)).mean() 
+
+
 def kl_divergence_loss(mu, logvar):
     return -0.5 * torch.mean(1 + logvar - mu.pow(2) - logvar.exp())
+
+
+def focal_loss(logits, labels, mask, alpha=0.5, gamma=2):
+    
+    bce_loss = F.binary_cross_entropy_with_logits(logits, labels.float(), 
+                                                  reduce=False)
+    pt = torch.exp(-bce_loss)
+    at = pt.new([alpha, 1 - alpha])[labels.long()]
+    focal_loss = at * (1 - pt) ** gamma * bce_loss
+
+    return (focal_loss * mask.unsqueeze(1).float()).mean()
+
+
+def prior_offset_loss(logits, labels, mask, priors):
+
+    priors = logits.new(priors).view(-1, 1, 1)
+    prior_logits = torch.log(priors / (1 - priors))
+    labels = labels.float()
+
+    weights = .5 / priors * labels + .5 / (1 - priors) * (1 - labels)
+    weights = weights * mask.unsqueeze(1).float()
+    return F.binary_cross_entropy_with_logits(logits - prior_logits, labels, 
+                                              weights)

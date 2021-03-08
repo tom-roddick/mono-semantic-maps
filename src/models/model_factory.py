@@ -6,7 +6,8 @@ import torch.nn as nn
 from .pyramid import PyramidOccupancyNetwork
 from .ved import VariationalEncoderDecoder
 from .vpn import VPNModel
-from .criterion import OccupancyCriterion, VaeOccupancyCriterion
+from .criterion import OccupancyCriterion, VaeOccupancyCriterion, \
+    FocalLossCriterion, PriorOffsetCriterion
 
 from ..nn.fpn import FPN50
 from ..nn.topdown import TopdownNetwork
@@ -41,9 +42,14 @@ def build_criterion(model_name, config):
                                           config.uncert_weight,
                                           config.kld_weight, 
                                           config.class_weights)
+                                          
+    elif config.loss_fn == 'focal':
+        criterion = FocalLossCriterion(config.focal.alpha, config.focal.gamma)
+    elif config.loss_fn == 'prior':
+        criterion = PriorOffsetCriterion(config.prior)
     else:
-        criterion = OccupancyCriterion(config.xent_weight, config.uncert_weight,
-                                       config.class_weights)
+        criterion = OccupancyCriterion(config.prior, config.xent_weight, 
+                                       config.uncert_weight, config.weight_mode)
     
     if len(config.gpus) > 0:
         criterion.cuda()

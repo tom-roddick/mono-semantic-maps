@@ -172,3 +172,17 @@ VAL_SCENES = [
     "scene-1003", "scene-1016", "scene-1017", "scene-1018", "scene-1055", 
     "scene-1056", "scene-1057", "scene-1058", "scene-1059", "scene-1060", 
     "scene-1061", "scene-1062", "scene-1063"]
+
+
+CALIBRATION_SCENES = [
+    "scene-0852", "scene-0429", "scene-0956", "scene-0194", "scene-0811", 
+    "scene-1110", "scene-1107", "scene-0294", "scene-0900", "scene-0596", 
+    "scene-0296", "scene-0885", "scene-0866", "scene-0105", "scene-0782", 
+    "scene-0191", "scene-0876", "scene-0133", "scene-0231", "scene-0847", 
+    "scene-0363", "scene-0026", "scene-0791", "scene-0909", "scene-0002", 
+    "scene-0283", "scene-0007", "scene-0251", "scene-1100", "scene-0668", 
+    "scene-0584", "scene-0287", "scene-0260", "scene-0171", "scene-0789", 
+    "scene-0108", "scene-0190", "scene-0206", "scene-0635", "scene-0815", 
+    "scene-0058", "scene-0710", "scene-0302", "scene-0639", "scene-0166", 
+    "scene-0094", "scene-0735", "scene-0321", "scene-1091", "scene-0344"
+]

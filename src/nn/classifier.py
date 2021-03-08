@@ -1,4 +1,5 @@
 import math
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -8,8 +9,9 @@ class LinearClassifier(nn.Conv2d):
         super().__init__(in_channels, num_class, 1)
     
     def initialise(self, prior):
+        prior = torch.tensor(prior)
         self.weight.data.zero_()
-        self.bias.data.fill_(-math.log((1 - prior) / prior))
+        self.bias.data.copy_(torch.log(prior / (1 - prior)))
     
 
 
@@ -21,8 +23,9 @@ class BayesianClassifier(nn.Module):
         self.num_samples = num_samples
     
     def initialise(self, prior):
+        prior = torch.tensor(prior)
         self.conv.weight.data.zero_()
-        self.conv.bias.data.fill_(-math.log((1 - prior) / prior))
+        self.conv.bias.data.copy_(torch.log(prior / (1 - prior)))
     
     def forward(self, features):
 
@@ -34,9 +37,9 @@ class BayesianClassifier(nn.Module):
         else:
             # At test time, apply dropout multiple times and average the result
             mean_score = 0
-            for _ in self.num_samples:
+            for _ in range(self.num_samples):
                 drop_feats = F.dropout2d(features, 0.5, training=True)
-                mean_score += F.sigmoid(self.classifier(drop_feats))
+                mean_score += F.sigmoid(self.conv(drop_feats))
             mean_score = mean_score / self.num_samples
 
             # Convert back into logits format

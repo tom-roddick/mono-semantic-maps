@@ -1,3 +1,0 @@
-logdir: ${LOGDIR}/bayesian/baseline
-bayesian: False
-gpus: [0, 1, 2, 3]
