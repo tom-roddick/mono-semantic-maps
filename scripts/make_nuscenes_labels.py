@@ -3,7 +3,6 @@ import sys
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-#from progressbar import progressbar
 from collections import OrderedDict
 
 from shapely.strtree import STRtree

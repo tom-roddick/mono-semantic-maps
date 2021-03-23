@@ -11,22 +11,15 @@ class TransformerPyramid(nn.Module):
         
         super().__init__()
         self.transformers = nn.ModuleList()
-        print('resolution', resolution)
         for i in range(5):
             
             # Scaled focal length for each transformer
             focal = focal_length / pow(2, i + 3)
-            
-            if resolution == 0.5:
-                scaling = 1.0
-            else:
-                scaling = 0.5
 
             # Compute grid bounds for each transformer
-            zmax = min(math.floor(focal * 2) * resolution * scaling, extents[3])
-            zmin = math.floor(focal) * resolution * scaling if i < 4 else extents[1]
+            zmax = min(math.floor(focal * 2) * resolution, extents[3])
+            zmin = math.floor(focal) * resolution if i < 4 else extents[1]
             subset_extents = [extents[0], zmin, extents[2], zmax]
-            print(f'Transformer {i} extent {subset_extents}')
             # Build transformers
             tfm = DenseTransformer(in_channels, channels, resolution, 
                                    subset_extents, ymin, ymax, focal)

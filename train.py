@@ -2,7 +2,6 @@
 import os
 from datetime import datetime
 from argparse import ArgumentParser
-#from progressbar import progressbar
 from tqdm import tqdm
 
 import torch

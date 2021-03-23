@@ -54,7 +54,7 @@ class VariationalEncoderDecoder(nn.Module):
 
         # Downsample input image so that it more closely matches
         # the input dimensions used in the original paper
-        #image = image[:, :, ::2, ::2]
+        image = image[:, :, ::2, ::2]
 
         # Run model forwards
         logits, mu, logvar = self.model(image, self.output_size, self.training)
@@ -230,6 +230,7 @@ class VaeMapping(nn.Module):
             return mu
 
     def forward(self, x, output_size, is_training=False, defined_mu=None):
+
         x = self.vgg16_feature(x)
         mu, logvar = self.encoder_afterv_vgg(x)
         z = self.reparameterize(is_training, mu, logvar)
