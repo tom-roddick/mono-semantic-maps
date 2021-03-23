@@ -3,7 +3,7 @@
 ### Training options ###
 
 # IDs of GPUs to use during training
-gpus: [0, 2, 3, 4]
+gpus: [0, 1]
 
 # Number of examples per mini-batch
 batch_size: 12
@@ -42,16 +42,16 @@ train_split: train
 val_split: val
 
 # Root data directory 
-dataroot: ${DATA_ROOT}/nuscenes
+dataroot: /mnt/local/datasets/nuscenes
 
 # NuScenes dataset version
 nuscenes_version: v1.0-trainval
 
 # Directory containing pregenerated training labels
-label_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
+label_root: /mnt/local/datasets/nuscenes/roddick-map-labels-v1.2
 
 # Input image size after downsampling
-img_size: [800, 600]
+img_size: [352, 128]
 
 # Hold out portion of train data to calibrate on
 hold_out_calibration: False
@@ -94,16 +94,16 @@ prior:
 hflip: True
 
 # Top-left and bottom right coordinates of map region, in meters
-map_extents: [-25., 1., 25., 50.]
+map_extents: [-50., 1., 50., 50.]
 
 # Spacing between adjacent grid cells in the map, in meters
-map_resolution: 0.25
+map_resolution: 0.50
 
 # Log loss to tensorboard every N iterations
-log_interval: 10
+log_interval: 100
 
 # Visualise predictions every N iterations
-vis_interval: 200
+vis_interval: 2000
 
 
 ### Model options ###

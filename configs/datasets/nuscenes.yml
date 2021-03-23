@@ -1,8 +1,7 @@
 train_dataset: nuscenes
-dataroot: ${DATA_ROOT}/nuscenes
+dataroot: /mnt/local/datasets/nuscenes
 nuscenes_version: v1.0-trainval
-label_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
-img_size: [800, 600]
+label_root: /mnt/local/datasets/nuscenes/roddick-map-labels-v1.2
 num_class: 14
 class_weights:
   -    1.7    # drivable_area
