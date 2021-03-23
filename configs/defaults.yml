@@ -42,13 +42,13 @@ train_split: train
 val_split: val
 
 # Root data directory 
-dataroot: /mnt/local/datasets/nuscenes
+dataroot: /mnt/local/datasets/nuscenes/trainval
 
 # NuScenes dataset version
 nuscenes_version: v1.0-trainval
 
 # Directory containing pregenerated training labels
-label_root: /mnt/local/datasets/nuscenes/roddick-map-labels-v1.2
+label_root: /mnt/local/datasets/nuscenes/trainval/roddick-map-labels-v1.2
 
 # Input image size after downsampling
 img_size: [352, 128]
@@ -97,7 +97,7 @@ hflip: True
 map_extents: [-50., 1., 50., 50.]
 
 # Spacing between adjacent grid cells in the map, in meters
-map_resolution: 0.50
+map_resolution: 0.5
 
 # Log loss to tensorboard every N iterations
 log_interval: 100

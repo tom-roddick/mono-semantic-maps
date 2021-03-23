@@ -2,7 +2,8 @@ import os
 import sys
 import numpy as np
 from PIL import Image
-from progressbar import progressbar
+from tqdm import tqdm
+#from progressbar import progressbar
 from collections import OrderedDict
 
 from shapely.strtree import STRtree
@@ -140,9 +141,10 @@ if __name__ == '__main__':
     output_root = os.path.expandvars(config.label_root)
     os.makedirs(output_root, exist_ok=True)
     
+   # print(nuscenes.scene)
     # Iterate over NuScene scenes
     print("\nGenerating labels...")
-    for scene in progressbar(nuscenes.scene):
+    for scene in tqdm(nuscenes.scene):
         process_scene(nuscenes, map_data, scene, config)
 
 
