@@ -6,7 +6,7 @@
 gpus: [0, 1]
 
 # Number of examples per mini-batch
-batch_size: 12
+batch_size: 48
 
 # Number of dataloader threads
 num_workers: 8
@@ -27,7 +27,7 @@ logdir: logs
 num_epochs: 200
 
 # Number of examples per epoch
-epoch_size: 50000
+epoch_size: 500
 
 
 #### Data options ####
@@ -94,10 +94,10 @@ prior:
 hflip: True
 
 # Top-left and bottom right coordinates of map region, in meters
-map_extents: [-50., 1., 50., 50.]
+map_extents: [-50., 2, 50., 50.]
 
 # Spacing between adjacent grid cells in the map, in meters
-map_resolution: 0.5
+map_resolution: 0.50
 
 # Log loss to tensorboard every N iterations
 log_interval: 100

@@ -2,6 +2,7 @@
 notebooks
 logs
 .idea/
+pretrained/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

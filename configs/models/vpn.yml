@@ -1,1 +1,4 @@
 model: vpn
+vpn:
+  output_size: [8, 22]
+map_extents: [-50., 1., 50., 50.]

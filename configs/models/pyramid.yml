@@ -9,4 +9,4 @@ topdown:
   strides: [1, 2]
   blocktype: bottleneck
 num_class: 14
-prior: 0.01
+#prior: 0.01

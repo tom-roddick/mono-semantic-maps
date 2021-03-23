@@ -42,7 +42,6 @@ class Resampler(nn.Module):
 
 
 def _make_grid(resolution, extents):
-
     # Create a grid of cooridinates in the birds-eye-view
     x1, z1, x2, z2 = extents
     zz, xx = torch.meshgrid(
