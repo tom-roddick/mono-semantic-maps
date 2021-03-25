@@ -2,7 +2,7 @@ import os
 import sys
 import numpy as np
 from PIL import Image
-from progressbar import progressbar
+from tqdm import tqdm
 from collections import OrderedDict
 
 from shapely.strtree import STRtree
@@ -78,7 +78,7 @@ def process_sample_data(nuscenes, map_data, sample_data, lidar, config):
     labels = encode_binary_labels(masks)
 
     # Save outputs to disk
-    output_path = os.path.join(os.path.expandvars(config.nuscenes.label_root),  
+    output_path = os.path.join(os.path.expandvars(config.label_root),
                                sample_data['token'] + '.png')
     Image.fromarray(labels.astype(np.int32), mode='I').save(output_path)
 
@@ -129,20 +129,21 @@ if __name__ == '__main__':
     config.merge_from_file('configs/datasets/nuscenes.yml')
 
     # Load NuScenes dataset
-    dataroot = os.path.expandvars(config.nuscenes.root)
-    nuscenes = NuScenes(config.nuscenes.version, dataroot)
+    dataroot = os.path.expandvars(config.dataroot)
+    nuscenes = NuScenes(config.nuscenes_version, dataroot)
 
     # Preload NuScenes map data
     map_data = { location : load_map_data(dataroot, location) 
                  for location in nusc_utils.LOCATIONS }
     
     # Create a directory for the generated labels
-    output_root = os.path.expandvars(config.nuscenes.label_root)
+    output_root = os.path.expandvars(config.label_root)
     os.makedirs(output_root, exist_ok=True)
     
+   # print(nuscenes.scene)
     # Iterate over NuScene scenes
     print("\nGenerating labels...")
-    for scene in progressbar(nuscenes.scene):
+    for scene in tqdm(nuscenes.scene):
         process_scene(nuscenes, map_data, scene, config)
 
 

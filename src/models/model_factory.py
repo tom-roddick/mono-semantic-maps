@@ -38,10 +38,12 @@ def build_model(model_name, config):
 def build_criterion(model_name, config):
 
     if model_name == 'ved':
-        criterion = VaeOccupancyCriterion(config.xent_weight, 
+        criterion = VaeOccupancyCriterion(config.prior,
+                                          config.xent_weight, 
                                           config.uncert_weight,
+                                          config.weight_mode,
                                           config.kld_weight, 
-                                          config.class_weights)
+                                          )
                                           
     elif config.loss_fn == 'focal':
         criterion = FocalLossCriterion(config.focal.alpha, config.focal.gamma)

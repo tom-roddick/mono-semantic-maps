@@ -33,7 +33,7 @@ from ..nn.losses import balanced_binary_cross_entropy, uncertainty_loss, \
 class OccupancyCriterion(nn.Module):
 
     def __init__(self, priors, xent_weight=1., uncert_weight=0., 
-                 weight_mode='sqrt'):
+                 weight_mode='sqrt_inverse'):
         super().__init__()
 
         self.xent_weight = xent_weight
@@ -91,9 +91,8 @@ class PriorOffsetCriterion(nn.Module):
 
 class VaeOccupancyCriterion(OccupancyCriterion):
 
-    def __init__(self, xent_weight=0.9, uncert_weight=0., kld_weight=0.1, 
-                 class_weights=None):
-        super().__init__(xent_weight, uncert_weight, class_weights)
+    def __init__(self, priors, xent_weight=0.9, uncert_weight=0., weight_mode='sqrt_inverse',  kld_weight=0.1):
+        super().__init__(priors, xent_weight, uncert_weight, weight_mode)
 
         self.kld_weight = kld_weight
     

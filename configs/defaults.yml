@@ -41,7 +41,7 @@ train_split: train
 # Name of split used for validation
 val_split: val
 
-# Root data directory 
+# Root data directory
 dataroot: ${DATA_ROOT}/nuscenes
 
 # NuScenes dataset version
@@ -74,7 +74,7 @@ class_weights:
   -   15.9    # barrier
 
 # Prior probability of a positive prediction, used to initialise classifier
-prior: 
+prior:
   - 0.44679   # drivable_area
   - 0.02407   # ped_crossing
   - 0.14491   # walkway

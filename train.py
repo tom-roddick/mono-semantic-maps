@@ -2,7 +2,7 @@
 import os
 from datetime import datetime
 from argparse import ArgumentParser
-from progressbar import progressbar
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
@@ -31,7 +31,7 @@ def train(dataloader, model, criterion, optimiser, summary, config, epoch):
     
     # Iterate over dataloader
     iteration = (epoch - 1) * len(dataloader)
-    for i, batch in enumerate(progressbar(dataloader, poll_interval=1)):
+    for i, batch in enumerate(tqdm(dataloader)):
 
         # Move tensors to GPU
         if len(config.gpus) > 0:
@@ -85,7 +85,7 @@ def evaluate(dataloader, model, criterion, summary, config, epoch):
     confusion = BinaryConfusionMatrix(config.num_class)
     
     # Iterate over dataset
-    for i, batch in enumerate(progressbar(dataloader, poll_interval=1)):
+    for i, batch in enumerate(tqdm(dataloader)):
 
         # Move tensors to GPU
         if len(config.gpus) > 0:

@@ -230,7 +230,7 @@ class VaeMapping(nn.Module):
             return mu
 
     def forward(self, x, output_size, is_training=False, defined_mu=None):
-        
+
         x = self.vgg16_feature(x)
         mu, logvar = self.encoder_afterv_vgg(x)
         z = self.reparameterize(is_training, mu, logvar)
