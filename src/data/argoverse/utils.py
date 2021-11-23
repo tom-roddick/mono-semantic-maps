@@ -60,7 +60,7 @@ def get_object_masks(scene, camera, frame, extents, resolution):
 
         # Render the bounding box to the appropriate mask layer
         class_id = argoverse_name_to_class_id(obj.label_class)
-        render_bbox(masks[class_id], cam_bbox, extents, resolution)
+        render_polygon(masks[class_id], cam_bbox, extents, resolution)
     
     return masks.astype(np.bool)
 

@@ -20,7 +20,9 @@ from src.data.argoverse.utils import get_object_masks, get_map_mask
 def process_split(split, map_data, config):
 
     # Create an Argoverse loader instance
-    path = os.path.join(os.path.expandvars(config.argoverse.root), split)
+    print(config)
+    # path = os.path.join(os.path.expandvars(config.argoverse.root), split)
+    path = os.path.join(os.path.expandvars(config.dataroot), split)
     print("Loading Argoverse tracking data at " + path)
     loader = ArgoverseTrackingLoader(path)
 
@@ -70,7 +72,7 @@ def process_frame(split, scene, camera, frame, map_data, config):
 
     # Create a filename and directory
     timestamp = str(scene.image_timestamp_list_sync[camera][frame])
-    output_path = os.path.join(config.argoverse.label_root, split, 
+    output_path = os.path.join(config.label_root, split, 
                                scene.current_log, camera, 
                                f'{camera}_{timestamp}.png')
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -87,7 +89,9 @@ if __name__ == '__main__':
     # Create an Argoverse map instance
     map_data = ArgoverseMap()
 
-    for split in ['train', 'val']:
+    # for split in ['train', 'val']:
+    #     process_split(split, map_data, config)
+    for split in ['train1']:
         process_split(split, map_data, config)
 
 
