@@ -9,6 +9,7 @@ from argoverse.utils.camera_stats import RING_CAMERA_LIST
 
 from .utils import IMAGE_WIDTH, IMAGE_HEIGHT, ARGOVERSE_CLASS_NAMES
 from ..utils import decode_binary_labels
+import numpy as np
 
 
 class ArgoverseMapDataset(Dataset):
@@ -24,7 +25,7 @@ class ArgoverseMapDataset(Dataset):
 
         # Preload training examples from Argoverse train and test sets
         self.loaders = argo_loaders
-        for split, loader in loaders.items():
+        for split, loader in self.loaders.items():
             self.preload(split, loader, log_names)
 
 
@@ -38,6 +39,7 @@ class ArgoverseMapDataset(Dataset):
             if log_names is not None and logid not in log_names:
                 continue
 
+            print("log id is {}".format(logid))
             self.calibs[logid] = dict()
             for camera, timestamps in log.image_timestamp_list_sync.items():
 
@@ -47,6 +49,8 @@ class ArgoverseMapDataset(Dataset):
                 # Load image paths
                 for timestamp in timestamps:
                     self.examples[timestamp] = (split, logid, camera)
+
+        self.timestamps = sorted(self.examples.keys())
     
 
     def __len__(self):
@@ -55,8 +59,13 @@ class ArgoverseMapDataset(Dataset):
 
     def __getitem__(self, timestamp):
 
+        timestamp = self.timestamps[timestamp]
         # Get the split, log and camera ids corresponding to the given timestamp
         split, log, camera = self.examples[timestamp]
+
+        # CHANGED
+        if split == 'train' or split == 'val':
+            split = 'train'
 
         image = self.load_image(split, log, camera, timestamp)
         calib = self.load_calib(split, log, camera)
@@ -72,9 +81,14 @@ class ArgoverseMapDataset(Dataset):
         image = loader.get_image_at_timestamp(timestamp, camera, log)
         
         # Resize to the desired dimensions
-        image = image.resize(self.image_size)
+        # print(type(image))
+        # print(self.image_size)
+        # image = image.resize(self.image_size)
 
-        return to_tensor(image)
+        image_resized = np.resize(image, self.image_size) # CHANGED
+        
+
+        return to_tensor(image_resized) # CHANGED
     
 
     def load_calib(self, split, log, camera):
@@ -94,8 +108,11 @@ class ArgoverseMapDataset(Dataset):
     def load_labels(self, split, log, camera, timestamp):
 
         # Construct label path from example data
+        # label_path = os.path.join(self.label_root, split, log, camera, 
+        #                           timestamp, f'{camera}_{timestamp}.png')
+                                
         label_path = os.path.join(self.label_root, split, log, camera, 
-                                  timestamp, f'{camera}_{timestamp}.png')
+                                   f'{camera}_{timestamp}.png')
         
         # Load encoded label image as a torch tensor
         encoded_labels = to_tensor(Image.open(label_path)).long()

@@ -27,6 +27,9 @@ class Resampler(nn.Module):
         calib = calib[:, [0, 2]][..., [0, 2]].view(-1, 1, 1, 2, 2)
 
         # Transform grid center locations into image u-coordinates
+        # print(calib.type())
+        # print(self.grid.type())
+        calib = calib.float()
         cam_coords = torch.matmul(calib, self.grid.unsqueeze(-1)).squeeze(-1)
 
         # Apply perspective projection and normalize

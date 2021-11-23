@@ -12,6 +12,24 @@ class_weights:
       -  7.0    # trailer
       - 27.5    # motorcycle
 
+prior:
+  - 0.44679   # drivable_area
+  - 0.5
+  - 0.00119   # pedestrian
+  - 0.005
+  - 0.00012   # bicycle
+  - 0.00156   # bus
+  - 0.00189   # trailer
+  - 0.00019   # motorcycle
+  # - 0.02407   # ped_crossing
+  # - 0.14491   # walkway
+  # - 0.02994   # carpark
+  # - 0.02086   # car
+  # - 0.00477   # truck
+  # - 0.00084   # construction_vehicle
+  # - 0.00031   # traffic_cone
+  # - 0.00176   # barrier
+
 vpn:
   output_size : [38, 60]
 

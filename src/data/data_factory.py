@@ -35,14 +35,26 @@ def build_argoverse_datasets(config):
     
     # Load native argoverse splits
     loaders = {
+        # 'train' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train')),
+        # 'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'val'))
         'train' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train')),
-        'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'val'))
+        'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train'))
+    }
+
+
+    train_loaders = {
+        'train' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train')),
+    }
+    val_loaders = {
+        'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train'))
     }
 
     # Create datasets using new argoverse splits
-    train_data = ArgoverseMapDataset(loaders, config.label_root, 
+    train_data = ArgoverseMapDataset(train_loaders, config.label_root, 
                                      config.img_size, TRAIN_LOGS)
-    val_data = ArgoverseMapDataset(loaders, config.label_root, 
+
+    print("length of the train data set: {}".format(len(train_data)))
+    val_data = ArgoverseMapDataset(val_loaders, config.label_root, 
                                    config.img_size, VAL_LOGS)
     return train_data, val_data
 
@@ -77,6 +89,7 @@ def build_dataloaders(dataset_name, config):
     sampler = RandomSampler(train_data, True, config.epoch_size)
     train_loader = DataLoader(train_data, config.batch_size, sampler=sampler,
                               num_workers=config.num_workers)
+
     
     # Create validation dataloader
     val_loader = DataLoader(val_data, config.batch_size, 

@@ -3,10 +3,12 @@
 ### Training options ###
 
 # IDs of GPUs to use during training
-gpus: [0, 2, 3, 4]
+# gpus: [0, 2, 3, 4]
+gpus: [0]
 
 # Number of examples per mini-batch
-batch_size: 12
+# batch_size: 12
+batch_size: 4
 
 # Number of dataloader threads
 num_workers: 8
