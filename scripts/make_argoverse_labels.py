@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     # for split in ['train', 'val']:
     #     process_split(split, map_data, config)
-    for split in ['train1']:
+    for split in ['val']:
         process_split(split, map_data, config)
 
 

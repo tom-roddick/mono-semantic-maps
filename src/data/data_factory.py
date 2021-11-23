@@ -49,7 +49,7 @@ def build_argoverse_datasets(config):
     # since we are using a subset of train set as validation, we need to
     # set the identifier as train.
     val_loaders = {
-        'train' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train'))
+        'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'val'))
     }
 
     # Create datasets using new argoverse splits
@@ -89,7 +89,10 @@ def build_dataloaders(dataset_name, config):
     train_data, val_data = build_trainval_datasets(dataset_name, config)
 
     # Create training set dataloader
-    sampler = RandomSampler(train_data, True, config.epoch_size)
+    # sampler = RandomSampler(train_data, True, config.epoch_size)
+
+    # CHANGED
+    sampler = RandomSampler(train_data, True, len(train_data))
     train_loader = DataLoader(train_data, config.batch_size, sampler=sampler,
                               num_workers=config.num_workers)
 

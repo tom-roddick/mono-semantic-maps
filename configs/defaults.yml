@@ -29,7 +29,7 @@ logdir: logs
 num_epochs: 200
 
 # Number of examples per epoch
-epoch_size: 50000
+epoch_size: 12500
 
 
 #### Data options ####
