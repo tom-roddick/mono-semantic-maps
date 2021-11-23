@@ -9,8 +9,6 @@ from argoverse.utils.camera_stats import RING_CAMERA_LIST
 
 from .utils import IMAGE_WIDTH, IMAGE_HEIGHT, ARGOVERSE_CLASS_NAMES
 from ..utils import decode_binary_labels
-import numpy as np
-
 
 class ArgoverseMapDataset(Dataset):
 
@@ -64,8 +62,8 @@ class ArgoverseMapDataset(Dataset):
         split, log, camera = self.examples[timestamp]
 
         # CHANGED
-        if split == 'train' or split == 'val':
-            split = 'train'
+        # if split == 'train' or split == 'val':
+        #     split = 'train'
 
         image = self.load_image(split, log, camera, timestamp)
         calib = self.load_calib(split, log, camera)
@@ -81,14 +79,12 @@ class ArgoverseMapDataset(Dataset):
         image = loader.get_image_at_timestamp(timestamp, camera, log)
         
         # Resize to the desired dimensions
-        # print(type(image))
-        # print(self.image_size)
         # image = image.resize(self.image_size)
 
-        image_resized = np.resize(image, self.image_size) # CHANGED
-        
+        # CHANGED
+        image = Image.fromarray(image).resize(self.image_size)
 
-        return to_tensor(image_resized) # CHANGED
+        return to_tensor(image) # CHANGED
     
 
     def load_calib(self, split, log, camera):
