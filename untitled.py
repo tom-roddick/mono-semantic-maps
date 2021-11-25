@@ -1,3 +1,4 @@
+import pdb;pdb.set_trace 
 
 import os
 from datetime import datetime
@@ -17,6 +18,8 @@ from src.utils.confusion import BinaryConfusionMatrix
 from src.data.nuscenes.utils import NUSCENES_CLASS_NAMES
 from src.data.argoverse.utils import ARGOVERSE_CLASS_NAMES
 from src.utils.visualise import colorise
+import numpy as np
+import cv2
 
 def train(dataloader, model, criterion, optimiser, summary, config, epoch):
 
@@ -252,106 +255,45 @@ def create_experiment(config, tag, resume=None):
     
     return logdir
 
+import sys
+sys.argv = ['']
+parser = ArgumentParser()
 
+args = parser.parse_args()
+args.dataset = 'argoverse'
+args.model = 'pyramid'
+args.resume = 'logs/run_21-11-24--16-55-15_one_sequence_one_camera'
+args.experiment = 'test'
+args.options = []
 
-    
+# Load configuration
+config = get_configuration(args)
 
+# Set default device
+if len(config.gpus) > 0:
+    torch.cuda.set_device(config.gpus[0])
 
+# Setup experiment
+model = build_model(config.model, config)
+train_loader, val_loader = build_dataloaders(config.train_dataset, config)
 
-
-def main():
-
-    parser = ArgumentParser()
-    parser.add_argument('--tag', type=str, default='run',
-                        help='optional tag to identify the run')
-    parser.add_argument('--dataset', choices=['nuscenes', 'argoverse'],
-                        default='nuscenes', help='dataset to train on')
-    parser.add_argument('--model', choices=['pyramid', 'vpn', 'ved'],
-                        default='pyramid', help='model to train')
-    parser.add_argument('--experiment', default='test', 
-                        help='name of experiment config to load')
-    parser.add_argument('--resume', default=None, 
-                        help='path to an experiment to resume')
-    parser.add_argument('--options', nargs='*', default=[],
-                        help='list of addition config options as key-val pairs')
-    args = parser.parse_args()
-
-    # Load configuration
-    config = get_configuration(args)
-    
-    # Create a directory for the experiment
-    logdir = create_experiment(config, args.tag, args.resume)
-
-    # Create tensorboard summary 
-    summary = SummaryWriter(logdir)
-
-    # Set default device
+for i, batch in enumerate(train_loader):
+    # Move tensors to GPU
     if len(config.gpus) > 0:
-        torch.cuda.set_device(config.gpus[0])
-
-    # Setup experiment
-    model = build_model(config.model, config)
-    criterion = build_criterion(config.model, config)
-    train_loader, val_loader = build_dataloaders(config.train_dataset, config)
-
-    # Build optimiser and learning rate scheduler
-    optimiser = SGD(model.parameters(), config.learning_rate, 
-                    weight_decay=config.weight_decay)
-    lr_scheduler = MultiStepLR(optimiser, config.lr_milestones, 0.1)
-
-    # Load checkpoint
-    if args.resume:
-        epoch, best_iou = load_checkpoint(os.path.join(logdir, 'latest.pth'),
-                                          model, optimiser, lr_scheduler)
-    else:
-        epoch, best_iou = 1, 0
-
-    # Main training loop
-    while epoch <= config.num_epochs:
-        
-        print('\n\n=== Beginning epoch {} of {} ==='.format(epoch, 
-                                                            config.num_epochs))
-        
-        # Train model for one epoch
-        train(train_loader, model, criterion, optimiser, summary, config, epoch)
-
-        # Evaluate on the validation set
-#         val_iou = evaluate(val_loader, model, criterion, summary, config, epoch)
-
-        # Update learning rate
-        lr_scheduler.step()
-
-        # Save checkpoints
-#         if val_iou > best_iou:
-#             best_iou = val_iou
-#             save_checkpoint(os.path.join(logdir, 'best.pth'), model, 
-#                             optimiser, lr_scheduler, epoch, best_iou)
-        
-        save_checkpoint(os.path.join(logdir, 'latest.pth'), model, optimiser, 
-                        lr_scheduler, epoch, best_iou)
-        
-        epoch += 1
-    
-    print("\nTraining complete!")
+        batch = [t.cuda() for t in batch]
+    # Predict class occupancy scores and compute loss
+    image, calib, labels, mask = batch
+    image = image[:1, ]
+    calib = calib[:1, ]
+    labels = labels[:1,]
+    mask = mask[:1,]
 
 
+    logits = model(image, calib)
+    logits = logits.cpu().detach().numpy()
+    img = np.argmax(logits.cpu().detach().numpy(), axis = 1)
+    img = np.np.concatenate([img, img, img], axis = 0)
+    img = np.transpose(img, (1, 2, 0))
+#     loss = criterion(logits, labels, mask)
 
-if __name__ == '__main__':
-    main()
-
-                
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
+    break

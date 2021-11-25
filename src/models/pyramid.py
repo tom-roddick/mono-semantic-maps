@@ -24,6 +24,7 @@ class PyramidOccupancyNetwork(nn.Module):
 
         # Transform image features to birds-eye-view
         bev_feats = self.transformer(feature_maps, calib)
+        import pdb;pdb.set_trace()
 
         # Apply topdown network
         td_feats = self.topdown(bev_feats)

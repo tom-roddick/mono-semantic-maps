@@ -41,7 +41,8 @@ class ArgoverseMapDataset(Dataset):
             self.calibs[logid] = dict()
             for camera, timestamps in log.image_timestamp_list_sync.items():
 
-                if camera not in RING_CAMERA_LIST:
+#                 if camera not in RING_CAMERA_LIST:
+                if camera not in ['ring_front_center']:
                     continue
 
                 # Load image paths

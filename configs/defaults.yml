@@ -26,7 +26,7 @@ weight_decay: 0.0001
 logdir: logs
 
 # Number of epochs to train for
-num_epochs: 200
+num_epochs: 15
 
 # Number of examples per epoch
 epoch_size: 12500
@@ -93,7 +93,7 @@ prior:
   - 0.00176   # barrier
 
 # Whether to use horizontal flips for data augmentation
-hflip: True
+hflip: False
 
 # Top-left and bottom right coordinates of map region, in meters
 map_extents: [-25., 1., 25., 50.]
