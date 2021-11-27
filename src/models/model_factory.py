@@ -13,6 +13,7 @@ from ..nn.fpn import FPN50
 from ..nn.topdown import TopdownNetwork
 from ..nn.pyramid import TransformerPyramid
 from ..nn.classifier import LinearClassifier, BayesianClassifier
+from ..nn.InversePerspectiveMapping import InversePerspectiveMapping
 
 
 
@@ -76,6 +77,7 @@ def build_pyramid_occupancy_network(config):
                              config.topdown.layers, config.topdown.strides,
                              config.topdown.blocktype)
     
+    
     # Build classifier
     if config.bayesian:
         classifier = BayesianClassifier(topdown.out_channels, config.num_class)
@@ -83,8 +85,11 @@ def build_pyramid_occupancy_network(config):
         classifier = LinearClassifier(topdown.out_channels, config.num_class)
     classifier.initialise(config.prior)
     
+    # Build ipm_transform
+    ipm_transform = InversePerspectiveMapping()
+    
     # Assemble Pyramid Occupancy Network
-    return PyramidOccupancyNetwork(frontend, transformer, topdown, classifier)
+    return PyramidOccupancyNetwork(frontend, transformer, topdown, classifier, ipm_transform)
 
 
 

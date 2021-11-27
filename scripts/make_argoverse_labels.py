@@ -89,9 +89,8 @@ if __name__ == '__main__':
     # Create an Argoverse map instance
     map_data = ArgoverseMap()
 
-    # for split in ['train', 'val']:
-    #     process_split(split, map_data, config)
-    for split in ['val']:
+    for split in ['train', 'val']:
         process_split(split, map_data, config)
+
 
 

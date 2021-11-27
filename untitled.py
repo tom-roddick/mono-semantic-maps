@@ -290,9 +290,10 @@ for i, batch in enumerate(train_loader):
 
 
     logits = model(image, calib)
-    logits = logits.cpu().detach().numpy()
-    img = np.argmax(logits.cpu().detach().numpy(), axis = 1)
-    img = np.np.concatenate([img, img, img], axis = 0)
+#     logits = logits.cpu().detach().numpy()
+    scores = logits.cpu().sigmoid()  
+    img = np.argmax(scores.detach().numpy(), axis = 1)
+    img = np.concatenate([img, img, img], axis = 0)
     img = np.transpose(img, (1, 2, 0))
 #     loss = criterion(logits, labels, mask)
 
