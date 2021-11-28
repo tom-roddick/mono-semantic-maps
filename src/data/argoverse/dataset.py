@@ -44,6 +44,9 @@ class ArgoverseMapDataset(Dataset):
                 if camera not in RING_CAMERA_LIST:
                     continue
 
+                if camera not in ['ring_front_center']:
+                    continue
+
                 # Load image paths
                 for timestamp in timestamps:
                     self.examples[timestamp] = (split, logid, camera)
