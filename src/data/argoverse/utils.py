@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import affine_transform
 from ..utils import render_polygon
-
+import matplotlib.pyplot as plt
 
 # Define Argoverse-specific constants
 IMAGE_WIDTH = 1920
@@ -47,7 +47,7 @@ def get_object_masks(scene, camera, frame, extents, resolution):
     # Initialise masks
     num_class = len(ARGOVERSE_CLASS_NAMES)
     masks = np.zeros((num_class + 1, mask_height, mask_width), dtype=np.uint8)
-
+    
     # Get calibration information
     calib = scene.get_calibration(camera)
 
@@ -61,7 +61,7 @@ def get_object_masks(scene, camera, frame, extents, resolution):
         # Render the bounding box to the appropriate mask layer
         class_id = argoverse_name_to_class_id(obj.label_class)
         render_polygon(masks[class_id], cam_bbox, extents, resolution)
-    
+
     return masks.astype(np.bool)
 
 

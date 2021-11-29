@@ -8,7 +8,7 @@ gpus: [0]
 
 # Number of examples per mini-batch
 # batch_size: 12
-batch_size: 4
+batch_size: 9
 
 # Number of dataloader threads
 num_workers: 8
@@ -26,7 +26,7 @@ weight_decay: 0.0001
 logdir: logs
 
 # Number of epochs to train for
-num_epochs: 15
+num_epochs: 400
 
 # Number of examples per epoch
 epoch_size: 12500
@@ -35,7 +35,7 @@ epoch_size: 12500
 #### Data options ####
 
 # Dataset to train on
-train_dataset: nuscenes
+train_dataset: argoverse
 
 # Name of split used for training
 train_split: train

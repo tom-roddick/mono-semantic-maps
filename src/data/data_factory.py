@@ -50,7 +50,7 @@ def build_argoverse_datasets(config):
     # set the identifier as train.
     val_loaders = {
 #         'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'val')) 
-        'train' : ArgoverseTrackingLoader(os.path.join(dataroot, 'train'))
+        'val' : ArgoverseTrackingLoader(os.path.join(dataroot, 'val'))
     }
 
     # Create datasets using new argoverse splits

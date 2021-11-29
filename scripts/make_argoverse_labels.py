@@ -48,24 +48,45 @@ def process_scene(split, scene, map_data, config):
 
 def process_frame(split, scene, camera, frame, map_data, config):
 
-    # Compute object masks
+#     # Compute object masks
+#     masks = get_object_masks(scene, camera, frame, config.map_extents,
+#                              config.map_resolution)
+    
+#     # Compute drivable area mask
+#     masks[0] = get_map_mask(scene, camera, frame, map_data, config.map_extents,
+#                             config.map_resolution)
+    
+#     # Ignore regions of the BEV which are outside the image
+#     calib = scene.get_calibration(camera)
+#     masks[-1] |= ~get_visible_mask(calib.K, calib.camera_config.img_width,
+#                                    config.map_extents, config.map_resolution)
+    
+#     # Ignore regions of the BEV which are occluded (based on LiDAR data)
+#     lidar = scene.get_lidar(frame)
+#     cam_lidar = calib.project_ego_to_cam(lidar)
+#     masks[-1] |= get_occlusion_mask(cam_lidar, config.map_extents, 
+#                                     config.map_resolution)
+
     masks = get_object_masks(scene, camera, frame, config.map_extents,
                              config.map_resolution)
-    
+    calib = scene.get_calibration(camera)
+
     # Compute drivable area mask
     masks[0] = get_map_mask(scene, camera, frame, map_data, config.map_extents,
                             config.map_resolution)
+
+
+    masks[:8, ] = (masks[:8, ] * get_visible_mask(calib.K, calib.camera_config.img_width, config.map_extents, config.map_resolution))
     
-    # Ignore regions of the BEV which are outside the image
-    calib = scene.get_calibration(camera)
+    
     masks[-1] |= ~get_visible_mask(calib.K, calib.camera_config.img_width,
                                    config.map_extents, config.map_resolution)
-    
-    # Ignore regions of the BEV which are occluded (based on LiDAR data)
+   
     lidar = scene.get_lidar(frame)
     cam_lidar = calib.project_ego_to_cam(lidar)
     masks[-1] |= get_occlusion_mask(cam_lidar, config.map_extents, 
                                     config.map_resolution)
+#     mask[-1] = 0
     
     # Encode masks as an integer bitmask
     labels = encode_binary_labels(masks)

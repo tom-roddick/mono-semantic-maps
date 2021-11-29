@@ -133,13 +133,13 @@ def visualise(summary, image, scores, labels, mask, step, dataset, split):
                       step, dataformats='NHWC')
 
     
-    # for i, name in enumerate(class_names):
-    #     summary.add_image(split + '/pred/' + name, scores[0, i], step, 
-    #                       dataformats='HW')
-    #     summary.add_image(split + '/gt/' + name, labels[0, i], step, 
-    #                       dataformats='HW')
+    for i, name in enumerate(class_names):
+        summary.add_image(split + '/pred/' + name, scores[0, i], step, 
+                          dataformats='HW')
+        summary.add_image(split + '/gt/' + name, labels[0, i], step, 
+                          dataformats='HW')
     
-    # summary.add_image(split + '/mask', mask[0], step, dataformats='HW')
+    summary.add_image(split + '/mask', mask[0], step, dataformats='HW')
 
 
 def display_results(confusion, dataset):
@@ -316,16 +316,16 @@ def main():
         train(train_loader, model, criterion, optimiser, summary, config, epoch)
 
         # Evaluate on the validation set
-#         val_iou = evaluate(val_loader, model, criterion, summary, config, epoch)
+        val_iou = evaluate(val_loader, model, criterion, summary, config, epoch)
 
         # Update learning rate
         lr_scheduler.step()
 
         # Save checkpoints
-#         if val_iou > best_iou:
-#             best_iou = val_iou
-#             save_checkpoint(os.path.join(logdir, 'best.pth'), model, 
-#                             optimiser, lr_scheduler, epoch, best_iou)
+        if val_iou > best_iou:
+            best_iou = val_iou
+            save_checkpoint(os.path.join(logdir, 'best.pth'), model, 
+                            optimiser, lr_scheduler, epoch, best_iou)
         
         save_checkpoint(os.path.join(logdir, 'latest.pth'), model, optimiser, 
                         lr_scheduler, epoch, best_iou)

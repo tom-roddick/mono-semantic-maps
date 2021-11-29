@@ -22,9 +22,9 @@ class AugmentedMapDataset(Dataset):
 
     
 def random_hflip(image, labels, mask):
-    coin = random.randint(0,1)
-    if coin:
-        image = torch.flip(image, (-1,))
-        labels = torch.flip(labels.int(), (-1,)).bool()
-        mask = torch.flip(mask.int(), (-1,)).bool()
+#     coin = random.randint(0,1)
+#     if coin:
+    image = torch.flip(image, (-1,))
+    labels = torch.flip(labels.int(), (-1,)).bool()
+    mask = torch.flip(mask.int(), (-1,)).bool()
     return image, labels, mask
