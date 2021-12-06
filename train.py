@@ -36,12 +36,15 @@ def train(dataloader, model, criterion, optimiser, summary, config, epoch):
         # Move tensors to GPU
         if len(config.gpus) > 0:
             batch = [t.cuda() for t in batch]
-        
+            
         # Predict class occupancy scores and compute loss
-        image, calib, labels, mask = batch
+        image, calib, labels, mask, ipm = batch
         if config.model == 'ved':
             logits, mu, logvar = model(image)
             loss = criterion(logits, labels, mask, mu, logvar)
+        elif config.model == 'pyramid_ipm':
+            logits = model(image, calib, ipm)
+            loss = criterion(logits, labels, mask)             
         else:
             logits = model(image, calib)
             loss = criterion(logits, labels, mask)
@@ -92,11 +95,14 @@ def evaluate(dataloader, model, criterion, summary, config, epoch):
             batch = [t.cuda() for t in batch]
         
         # Predict class occupancy scores and compute loss
-        image, calib, labels, mask = batch
+        image, calib, labels, mask, ipm = batch
         with torch.no_grad():
             if config.model == 'ved':
                 logits, mu, logvar = model(image)
                 loss = criterion(logits, labels, mask, mu, logvar)
+            elif config.model == 'pyramid_ipm':
+                logits = model(image, calib, ipm)
+                loss = criterion(logits, labels, mask)                
             else:
                 logits = model(image, calib)
                 loss = criterion(logits, labels, mask)
@@ -266,7 +272,7 @@ def main():
                         help='optional tag to identify the run')
     parser.add_argument('--dataset', choices=['nuscenes', 'argoverse'],
                         default='nuscenes', help='dataset to train on')
-    parser.add_argument('--model', choices=['pyramid', 'vpn', 'ved'],
+    parser.add_argument('--model', choices=['pyramid', 'vpn', 'ved', 'pyramid_ipm'],
                         default='pyramid', help='model to train')
     parser.add_argument('--experiment', default='test', 
                         help='name of experiment config to load')

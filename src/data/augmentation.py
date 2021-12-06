@@ -12,19 +12,21 @@ class AugmentedMapDataset(Dataset):
         return len(self.dataset)
     
     def __getitem__(self, index):
-        image, calib, labels, mask = self.dataset[index]
+        image, calib, labels, mask, ipm = self.dataset[index]
 
         # Apply data augmentation
         if self.hflip:
-            image, labels, mask = random_hflip(image, labels, mask)
+            image, labels, mask, ipm = random_hflip(image, labels, mask, ipm)
 
-        return image, calib, labels, mask
+        return image, calib, labels, mask, ipm
 
     
-def random_hflip(image, labels, mask):
+def random_hflip(image, labels, mask, ipm):
 #     coin = random.randint(0,1)
 #     if coin:
     image = torch.flip(image, (-1,))
     labels = torch.flip(labels.int(), (-1,)).bool()
     mask = torch.flip(mask.int(), (-1,)).bool()
-    return image, labels, mask
+    ipm = torch.flip(ipm, (-1,))
+
+    return image, labels, mask, ipm
