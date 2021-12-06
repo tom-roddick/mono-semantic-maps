@@ -29,6 +29,8 @@ class ArgoverseMapDataset(Dataset):
 
     def preload(self, split, loader, log_names=None):
 
+        limit = 18 * 9
+
         # Iterate over sequences
         for log in loader:
 
@@ -50,6 +52,14 @@ class ArgoverseMapDataset(Dataset):
                 # Load image paths
                 for timestamp in timestamps:
                     self.examples[timestamp] = (split, logid, camera)
+
+                    if len(self.examples) == limit:
+                        break
+                if len(self.examples) == limit:
+                    break
+            
+            if len(self.examples) == limit:
+                break
 
         self.timestamps = sorted(self.examples.keys())
     
@@ -119,6 +129,8 @@ class ArgoverseMapDataset(Dataset):
         # Decode to binary labels
         num_class = len(ARGOVERSE_CLASS_NAMES)
         labels = decode_binary_labels(encoded_labels, num_class+ 1)
+        # print(labels.shape)
+
         labels, mask = labels[:-1], ~labels[-1]
 
         return labels, mask

@@ -14,7 +14,8 @@ batch_size: 4
 num_workers: 8
 
 # Learning rate
-learning_rate: 0.1
+learning_rate: 0.01
+#learning_rate: 0.5
 
 # Decay learning rate by a factor 10 after the following number of epochs
 lr_milestones: [150, 185]
@@ -93,7 +94,8 @@ prior:
   - 0.00176   # barrier
 
 # Whether to use horizontal flips for data augmentation
-hflip: True
+hflip: False
+#hflip: True
 
 # Top-left and bottom right coordinates of map region, in meters
 map_extents: [-25., 1., 25., 50.]

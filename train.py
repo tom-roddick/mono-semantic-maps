@@ -166,7 +166,6 @@ def log_results(confusion, dataset, summary, split, epoch):
     summary.add_scalar(f'{split}/iou/MEAN', confusion.mean_iou, epoch)
 
 
-
 def save_checkpoint(path, model, optimizer, scheduler, epoch, best_iou):
 
     if isinstance(model, nn.DataParallel):

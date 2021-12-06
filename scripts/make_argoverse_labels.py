@@ -78,7 +78,7 @@ def process_frame(split, scene, camera, frame, map_data, config):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     # Save encoded label file to disk
-    Image.fromarray(labels.astype(np.int32), mode='I').save(output_path)
+    # Image.fromarray(labels.astype(np.int32), mode='I').save(output_path)
     
 
 if __name__ == '__main__':
