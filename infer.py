@@ -56,7 +56,8 @@ def infer(dataloader, model, criterion, config, vis_dir):
         counter += batch_size
         for i in range(batch_size):
             img_idx = counter + i
-            save_visualization(image[i], scores[i], labels[i], mask[i], img_idx, config.train_dataset, vis_dir)
+            save_visualization(image[i], scores[i] > config.score_thresh, labels[i], mask[i], img_idx, config.train_dataset, vis_dir)
+
 
     # Print and record results
     display_results(confusion, config.train_dataset)
@@ -71,11 +72,22 @@ def save_visualization(image, scores, labels, mask, step, dataset, save_dir):
     class_names = NUSCENES_CLASS_NAMES if dataset == 'nuscenes' \
         else ARGOVERSE_CLASS_NAMES
 
+    mask = mask.detach().cpu()
+    scores = scores * mask
+    labels = labels.detach().cpu() * mask
     gt_map = colorise(labels, 'coolwarm', 0, 1) * 255
     bev_map = colorise(scores, 'coolwarm', 0, 1) * 255
 
     gt_map = gt_map.astype(np.uint8)
     bev_map = bev_map.astype(np.uint8)
+
+    obstacles = mask == 0
+    gt_map[:, obstacles] = 0
+    bev_map[:, obstacles] = 0
+
+    # gt_map = gt_map * mask.detach().cpu().numpy()
+    # bev_map = bev_map * mask.detach().cpu().numpy()
+
     
     for i in range(3): # only visualize first three classes
         cls_name = class_names[i]
@@ -89,6 +101,14 @@ def save_visualization(image, scores, labels, mask, step, dataset, save_dir):
 
         Image.fromarray(gt_map[i]).save(os.path.join(gt_dir, '{}.jpg'.format(step)))
         Image.fromarray(bev_map[i]).save(os.path.join(pred_dir, '{}.jpg'.format(step)))
+
+    img_dir = os.path.join(save_dir, 'images')
+    if not os.path.exists(img_dir):
+        os.makedirs(img_dir)
+    image = image.cpu().numpy() * 255
+    image = image.astype(np.uint8)
+    image = np.moveaxis(image, 0, -1)
+    Image.fromarray(image).save(os.path.join(img_dir, '{}.jpg'.format(step)))
 
 
 def display_results(confusion, dataset):
