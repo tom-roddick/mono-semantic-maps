@@ -8,6 +8,7 @@ import argoverse
 from argoverse.utils.se3 import SE3
 from argoverse.data_loading.simple_track_dataloader import SimpleArgoverseTrackingDataLoader
 from argoverse.utils.calibration import get_calibration_config
+from PIL import Image
 
 import os
 from tqdm import tqdm
@@ -52,27 +53,20 @@ log_id = '10b8dee6-778f-33e4-a946-d842d2d9c3d7'
 camera_name = 'ring_front_center'
 # cam_timestamp = '315968229010581848'
 
-MASK_ROOT = './data/argo/masks'
-mask_folder = os.path.join(MASK_ROOT, split, log_id, camera_name)
-out_folder = os.path.join('./data/argo/masks_warped_bev_align', split, log_id, camera_name)
+# MASK_ROOT = './data/argo/masks'
+# mask_folder = os.path.join(MASK_ROOT, split, log_id, camera_name)
+img_folder = os.path.join(ARGOVERSE_DATA_ROOT, split, log_id, camera_name)
+out_folder = os.path.join('./data/argo/imgs_warped', split, log_id, camera_name)
 if not os.path.exists(out_folder):
     os.makedirs(out_folder)
 
 
-mask_names = [f for f in os.listdir(mask_folder) if f.endswith('.npy')]
+img_names = [f for f in os.listdir(img_folder) if f.endswith('.jpg')]
 
-# ['road', 'sidewalk', 'building', 'wall', 'fence', 'pole', 'traffic light', 'traffic sign', 'vegetation', 'terrain', 'sky', 'person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle']
+for img_name in tqdm(img_names):
+    img = cv2.imread(os.path.join(img_folder, img_name))
 
-for mask_name in tqdm(mask_names):
-    mask = np.load(os.path.join(mask_folder, mask_name)).astype(np.uint8)
-
-    drivable_mask = mask == 0
-    vehicle_mask = mask == 13
-    pedestrain_mask = mask == 11
-
-    mask_stacked = np.stack([drivable_mask, vehicle_mask, pedestrain_mask], axis=-1).astype(np.uint8)
-
-    cam_timestamp = mask_name.split('.')[0].split('_')[-1]
+    cam_timestamp = img_name.split('.')[0].split('_')[-1]
     
     dl = SimpleArgoverseTrackingDataLoader(data_dir=data_root_split, labels_dir=data_root_split)
     city = dl.get_city_name(log_id)
@@ -111,13 +105,11 @@ for mask_name in tqdm(mask_names):
     shiftedground_H_img = shiftedground_H_ground.dot(ground_H_img)
 
     # warping the mask
-    bev_np = cv2.warpPerspective(mask_stacked, shiftedground_H_img, dsize=(out_width, out_height))
+    bev_img = cv2.warpPerspective(img, shiftedground_H_img, dsize=(out_width, out_height))
     
     # align mask with labels
-    bev_np = resize_mask_bev_feature(bev_np)
-    print(np.unique(bev_np))
-    # np.save(os.path.join(out_folder, mask_name), bev_np)
-    break
+    bev_img = resize_mask_bev_feature(bev_img)
+    cv2.imwrite(os.path.join(out_folder, img_name), bev_img)
 
 
 # img_folder = os.path.join(ARGOVERSE_DATA_ROOT, split, log_id, camera_name)

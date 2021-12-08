@@ -8,13 +8,14 @@ gpus: [0]
 
 # Number of examples per mini-batch
 # batch_size: 12
-batch_size: 4
+batch_size: 9
 
 # Number of dataloader threads
 num_workers: 8
 
 # Learning rate
-learning_rate: 0.1
+learning_rate: 0.01
+#learning_rate: 0.5
 
 # Decay learning rate by a factor 10 after the following number of epochs
 lr_milestones: [150, 185]
@@ -26,7 +27,7 @@ weight_decay: 0.0001
 logdir: logs
 
 # Number of epochs to train for
-num_epochs: 200
+num_epochs: 400
 
 # Number of examples per epoch
 epoch_size: 12500
@@ -35,7 +36,7 @@ epoch_size: 12500
 #### Data options ####
 
 # Dataset to train on
-train_dataset: nuscenes
+train_dataset: argoverse
 
 # Name of split used for training
 train_split: train
@@ -51,6 +52,9 @@ nuscenes_version: v1.0-trainval
 
 # Directory containing pregenerated training labels
 label_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
+
+# Directory containing pregenerated ipm images
+ipm_root: ${PROCESSED_ROOT}/nuscenes/map-labels-v1.2
 
 # Input image size after downsampling
 img_size: [800, 600]
@@ -93,7 +97,8 @@ prior:
   - 0.00176   # barrier
 
 # Whether to use horizontal flips for data augmentation
-hflip: True
+hflip: False
+#hflip: True
 
 # Top-left and bottom right coordinates of map region, in meters
 map_extents: [-25., 1., 25., 50.]
@@ -110,8 +115,8 @@ vis_interval: 200
 
 ### Model options ###
 
-# Architecture to train [pyramid | ved | vpn ]
-model: pyramid
+# Architecture to train [pyramid | ved | vpn | pyramid_ipm]
+model: pyramid_ipm
 
 # Number of intermediate channels in the transformer layer
 tfm_channels: 64

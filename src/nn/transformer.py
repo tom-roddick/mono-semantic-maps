@@ -36,6 +36,18 @@ class DenseTransformer(nn.Module):
     def forward(self, features, calib, *args):
 
         # Crop feature maps to a fixed input height
+        # print(features[0].shape)
+        # test = self._crop_feature_map(features[0], calib[0])
+        # print(test.shape)
+
+        # focal_length, img_offset = calib[0][1, 1:]
+        # vmid = self.ymid * focal_length / self.zmin + img_offset
+        # vmin = math.floor(vmid - self.in_height / 2)
+        # vmax = math.floor(vmid + self.in_height / 2)
+        # print('vmin is {}'.format(vmin))
+        # print('vmax is {}'.format(vmax))
+        # print('====')
+
         features = torch.stack([self._crop_feature_map(fmap, cal) 
                                 for fmap, cal in zip(features, calib)])
         
@@ -45,6 +57,7 @@ class DenseTransformer(nn.Module):
         # Flatten height and channel dimensions
         B, C, _, W = features.shape
         flat_feats = features.flatten(1, 2)
+        # print(flat_feats.shape)
         bev_feats = self.fc(flat_feats).view(B, C, -1, W)
 
         # Resample to orthographic grid

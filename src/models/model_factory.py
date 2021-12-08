@@ -4,6 +4,7 @@ from functools import reduce
 import torch.nn as nn
 
 from .pyramid import PyramidOccupancyNetwork
+from .pyramid_ipm import PyramidOccupancyIPMNetwork
 from .ved import VariationalEncoderDecoder
 from .vpn import VPNModel
 from .criterion import OccupancyCriterion, VaeOccupancyCriterion, \
@@ -13,6 +14,7 @@ from ..nn.fpn import FPN50
 from ..nn.topdown import TopdownNetwork
 from ..nn.pyramid import TransformerPyramid
 from ..nn.classifier import LinearClassifier, BayesianClassifier
+# from ..nn.InversePerspectiveMapping import InversePerspectiveMapping
 
 
 
@@ -24,6 +26,8 @@ def build_model(model_name, config):
         model = build_variational_encoder_decoder(config)
     elif model_name == 'vpn':
         model = build_view_parsing_network(config)
+    elif model_name == 'pyramid_ipm':
+        model = build_pyramid_occupancy_ipm_network(config)
     else:
         raise ValueError("Unknown model name '{}'".format(model_name))
     
@@ -76,6 +80,40 @@ def build_pyramid_occupancy_network(config):
                              config.topdown.layers, config.topdown.strides,
                              config.topdown.blocktype)
     
+    
+    # Build classifier
+    if config.bayesian:
+        classifier = BayesianClassifier(topdown.out_channels, config.num_class)
+    else:
+        classifier = LinearClassifier(topdown.out_channels, config.num_class)
+    classifier.initialise(config.prior)
+    
+    # Build ipm_transform
+#     ipm_transform = InversePerspectiveMapping()
+
+    # Assemble Pyramid Occupancy Network
+#     return PyramidOccupancyNetwork(frontend, transformer, topdown, classifier, ipm_transform)
+
+    # Assemble Pyramid Occupancy Network
+    return PyramidOccupancyNetwork(frontend, transformer, topdown, classifier)
+
+def build_pyramid_occupancy_network(config):
+
+    # Build frontend
+    frontend = FPN50()
+
+    # Build transformer pyramid
+    tfm_resolution = config.map_resolution * reduce(mul, config.topdown.strides)
+    transformer = TransformerPyramid(256, config.tfm_channels, tfm_resolution,
+                                     config.map_extents, config.ymin, 
+                                     config.ymax, config.focal_length)
+
+    # Build topdown network
+    topdown = TopdownNetwork(config.tfm_channels, config.topdown.channels,
+                             config.topdown.layers, config.topdown.strides,
+                             config.topdown.blocktype)
+    
+    
     # Build classifier
     if config.bayesian:
         classifier = BayesianClassifier(topdown.out_channels, config.num_class)
@@ -86,6 +124,33 @@ def build_pyramid_occupancy_network(config):
     # Assemble Pyramid Occupancy Network
     return PyramidOccupancyNetwork(frontend, transformer, topdown, classifier)
 
+
+def build_pyramid_occupancy_ipm_network(config):
+
+    # Build frontend
+    frontend = FPN50()
+
+    # Build transformer pyramid
+    tfm_resolution = config.map_resolution * reduce(mul, config.topdown.strides)
+    transformer = TransformerPyramid(256, config.tfm_channels, tfm_resolution,
+                                     config.map_extents, config.ymin, 
+                                     config.ymax, config.focal_length)
+
+    # Build topdown network
+    topdown = TopdownNetwork(config.tfm_channels, config.topdown.channels,
+                             config.topdown.layers, config.topdown.strides,
+                             config.topdown.blocktype)
+    
+    
+    # Build classifier
+    if config.bayesian:
+        classifier = BayesianClassifier(topdown.out_channels, config.num_class)
+    else:
+        classifier = LinearClassifier(topdown.out_channels, config.num_class)
+    classifier.initialise(config.prior)
+    
+
+    return PyramidOccupancyIPMNetwork(frontend, transformer, topdown, classifier)
 
 
 def build_variational_encoder_decoder(config):
