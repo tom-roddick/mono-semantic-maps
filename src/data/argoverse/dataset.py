@@ -10,6 +10,7 @@ from argoverse.utils.camera_stats import RING_CAMERA_LIST
 from .utils import IMAGE_WIDTH, IMAGE_HEIGHT, ARGOVERSE_CLASS_NAMES
 from ..utils import decode_binary_labels
 import cv2 
+import numpy as np
 
 class ArgoverseMapDataset(Dataset):
 
@@ -78,9 +79,18 @@ class ArgoverseMapDataset(Dataset):
     def load_ipm(self, split, log, camera, timestamp):
         
         # Load image
-        ipm_path = os.path.join(self.ipm_root, split, log, camera, 
-                                   f'{camera}_{timestamp}.jpg')
-        ipm = cv2.imread(ipm_path)
+        if 'imgs' in self.ipm_root:
+            ipm_path = os.path.join(self.ipm_root, split, log, camera, f'{camera}_{timestamp}.jpg')
+            ipm = cv2.imread(ipm_path)
+            ipm = np.transpose(ipm, (2, 0, 1))
+        #load segmentation
+        else:            
+            ipm_path = os.path.join(self.ipm_root, split, log, camera, f'{camera}_{timestamp}.npy')
+            ipm = np.load(ipm_path)
+            ipm = np.transpose(ipm, (2, 0, 1))
+
+        
+        
         # image = image.resize(self.image_size)
 
         return torch.from_numpy(ipm) # CHANGED

@@ -26,7 +26,6 @@ class PyramidOccupancyIPMNetwork(nn.Module):
         # Transform image features to birds-eye-view
         bev_feats = self.transformer(feature_maps, calib)
 
-
         bev_feats = torch.cat((ipm, bev_feats), 1)
         
         # Apply topdown network

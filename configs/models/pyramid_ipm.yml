@@ -1,4 +1,4 @@
-model: pyramid
+model: pyramid_ipm
 tfm_channels: 64
 ymin: -2
 ymax: 4
