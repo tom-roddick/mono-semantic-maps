@@ -1,0 +1,12 @@
+model: pyramid_ipm
+tfm_channels: 64
+ymin: -2
+ymax: 4
+focal_length: 630.
+topdown:
+  channels: 128
+  layers: [4, 4]
+  strides: [1, 2]
+  blocktype: bottleneck
+# num_class: 14
+num_class: 8

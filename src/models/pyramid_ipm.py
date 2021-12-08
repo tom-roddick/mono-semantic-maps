@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class PyramidOccupancyNetwork(nn.Module):
+class PyramidOccupancyIPMNetwork(nn.Module):
 
 
     def __init__(self, frontend, transformer, topdown, classifier):
@@ -18,21 +18,16 @@ class PyramidOccupancyNetwork(nn.Module):
 #         self.ipm_transform = ipm_transform
     
 
-    def forward(self, image, calib, *args):
+    def forward(self, image, calib, ipm, *args):
 
         # Extract multiscale feature maps
         feature_maps = self.frontend(image)
 
         # Transform image features to birds-eye-view
         bev_feats = self.transformer(feature_maps, calib)
-        
-#         ipm_transform_on = True
-#         if ipm_transform_on:
-#             # concatenate the ipm features
-#             import pdb;pdb.set_trace()
-#             ipm = self.ipm_transform(image)
-#             bev_feats = torch.cat((ipm, bev_feats), 1)
-        
+
+
+        bev_feats = torch.cat((ipm, bev_feats), 1)
         
         # Apply topdown network
         td_feats = self.topdown(bev_feats)

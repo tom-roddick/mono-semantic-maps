@@ -54,11 +54,11 @@ def build_argoverse_datasets(config):
     }
 
     # Create datasets using new argoverse splits
-    train_data = ArgoverseMapDataset(train_loaders, config.label_root, 
+    train_data = ArgoverseMapDataset(train_loaders, config.label_root, config.ipm_root,
                                      config.img_size, TRAIN_LOGS)
 
     print("length of the train data set: {}".format(len(train_data)))
-    val_data = ArgoverseMapDataset(val_loaders, config.label_root, 
+    val_data = ArgoverseMapDataset(val_loaders, config.label_root, config.ipm_root, 
                                    config.img_size, VAL_LOGS)
     return train_data, val_data
 

@@ -9,13 +9,15 @@ from argoverse.utils.camera_stats import RING_CAMERA_LIST
 
 from .utils import IMAGE_WIDTH, IMAGE_HEIGHT, ARGOVERSE_CLASS_NAMES
 from ..utils import decode_binary_labels
+import cv2 
 
 class ArgoverseMapDataset(Dataset):
 
-    def __init__(self, argo_loaders, label_root, image_size=[960, 600], 
+    def __init__(self, argo_loaders, label_root, ipm_root, image_size=[960, 600], 
                  log_names=None):
 
         self.label_root = label_root
+        self.ipm_root = ipm_root
         self.image_size = image_size
 
         self.examples = dict()
@@ -43,7 +45,8 @@ class ArgoverseMapDataset(Dataset):
             self.calibs[logid] = dict()
             for camera, timestamps in log.image_timestamp_list_sync.items():
 
-                if camera not in RING_CAMERA_LIST:
+#                 if camera not in RING_CAMERA_LIST:
+                if camera not in ['ring_front_center']:
                     continue
 
                 if camera not in ['ring_front_center']:
@@ -81,9 +84,19 @@ class ArgoverseMapDataset(Dataset):
         image = self.load_image(split, log, camera, timestamp)
         calib = self.load_calib(split, log, camera)
         labels, mask = self.load_labels(split, log, camera, timestamp)
+        ipms = self.load_ipm(split, log, camera, timestamp)
 
-        return image, calib, labels, mask
+        return image, calib, labels, mask, ipms
 
+    def load_ipm(self, split, log, camera, timestamp):
+        
+        # Load image
+        ipm_path = os.path.join(self.ipm_root, split, log, camera, 
+                                   f'{camera}_{timestamp}.jpg')
+        ipm = cv2.imread(ipm_path)
+        # image = image.resize(self.image_size)
+
+        return torch.from_numpy(ipm) # CHANGED
 
     def load_image(self, split, log, camera, timestamp):
         
