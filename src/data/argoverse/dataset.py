@@ -10,6 +10,7 @@ from argoverse.utils.camera_stats import RING_CAMERA_LIST
 from .utils import IMAGE_WIDTH, IMAGE_HEIGHT, ARGOVERSE_CLASS_NAMES
 from ..utils import decode_binary_labels
 import cv2 
+import numpy as np
 
 class ArgoverseMapDataset(Dataset):
 
@@ -31,8 +32,6 @@ class ArgoverseMapDataset(Dataset):
 
     def preload(self, split, loader, log_names=None):
 
-        limit = 18 * 9
-
         # Iterate over sequences
         for log in loader:
 
@@ -49,20 +48,9 @@ class ArgoverseMapDataset(Dataset):
                 if camera not in ['ring_front_center']:
                     continue
 
-                if camera not in ['ring_front_center']:
-                    continue
-
                 # Load image paths
                 for timestamp in timestamps:
                     self.examples[timestamp] = (split, logid, camera)
-
-                    if len(self.examples) == limit:
-                        break
-                if len(self.examples) == limit:
-                    break
-            
-            if len(self.examples) == limit:
-                break
 
         self.timestamps = sorted(self.examples.keys())
     
@@ -71,8 +59,7 @@ class ArgoverseMapDataset(Dataset):
         return len(self.examples)
     
 
-    def __getitem__(self, timestamp):
-
+    def __getitem__(self, timestamp):      
         timestamp = self.timestamps[timestamp]
         # Get the split, log and camera ids corresponding to the given timestamp
         split, log, camera = self.examples[timestamp]
@@ -91,9 +78,18 @@ class ArgoverseMapDataset(Dataset):
     def load_ipm(self, split, log, camera, timestamp):
         
         # Load image
-        ipm_path = os.path.join(self.ipm_root, split, log, camera, 
-                                   f'{camera}_{timestamp}.jpg')
-        ipm = cv2.imread(ipm_path)
+        if 'imgs' in self.ipm_root:
+            ipm_path = os.path.join(self.ipm_root, split, log, camera, f'{camera}_{timestamp}.jpg')
+            ipm = cv2.imread(ipm_path)
+            ipm = np.transpose(ipm, (2, 0, 1))
+        #load segmentation
+        else:            
+            ipm_path = os.path.join(self.ipm_root, split, log, camera, f'{camera}_{timestamp}.npy')
+            ipm = np.load(ipm_path)
+            ipm = np.transpose(ipm, (2, 0, 1))
+
+        
+        
         # image = image.resize(self.image_size)
 
         return torch.from_numpy(ipm) # CHANGED
@@ -148,11 +144,3 @@ class ArgoverseMapDataset(Dataset):
 
         return labels, mask
         
-    
-
-
-
-
-
-    
-

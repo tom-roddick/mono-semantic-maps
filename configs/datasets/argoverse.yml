@@ -2,6 +2,8 @@ train_dataset: argoverse
 dataroot: data/argo/argoverse-tracking
 label_root: data/argo/labels
 ipm_root: data/argo/imgs_warped
+# ipm_root: data/argo/masks_warped_bev_align
+
 img_size: [960, 600]
 class_weights:
       -  1.7    # drivable_area

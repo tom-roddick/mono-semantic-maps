@@ -39,12 +39,18 @@ def infer(dataloader, model, criterion, config, vis_dir):
             batch = [t.cuda() for t in batch]
         
         # Predict class occupancy scores and compute loss
-        image, calib, labels, mask = batch
+        #image, calib, labels, mask = batch
         with torch.no_grad():
             if config.model == 'ved':
+                image, calib, labels, mask = batch
                 logits, mu, logvar = model(image)
                 loss = criterion(logits, labels, mask, mu, logvar)
+            elif config.model == 'pyramid_ipm':
+                image, calib, labels, mask, ipm = batch
+                logits = model(image, calib, ipm)
+                loss = criterion(logits, labels, mask)             
             else:
+                image, calib, labels, mask = batch
                 logits = model(image, calib)
                 loss = criterion(logits, labels, mask)
 
@@ -182,7 +188,7 @@ def main():
                         help='optional tag to identify the run')
     parser.add_argument('--dataset', choices=['nuscenes', 'argoverse'],
                         default='nuscenes', help='dataset to train on')
-    parser.add_argument('--model', choices=['pyramid', 'vpn', 'ved'],
+    parser.add_argument('--model', choices=['pyramid', 'pyramid_ipm', 'vpn', 'ved'],
                         default='pyramid', help='model to train')
     parser.add_argument('--experiment', default='test', 
                         help='name of experiment config to load')
