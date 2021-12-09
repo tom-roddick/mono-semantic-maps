@@ -61,6 +61,11 @@ class ArgoverseMapDataset(Dataset):
 
     def __getitem__(self, timestamp):
 
+        if timestamp == 119:
+            timestamp = self.timestamps[timestamp]
+            split, log, camera = self.examples[timestamp]
+            print(timestamp)
+            print(split, log, camera)
         timestamp = self.timestamps[timestamp]
         # Get the split, log and camera ids corresponding to the given timestamp
         split, log, camera = self.examples[timestamp]
