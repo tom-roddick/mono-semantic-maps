@@ -18,7 +18,7 @@ To train our method on NuScenes you will first need to
 
 ### Argoverse
 To train on the Argoverse dataset:
-1. Download the Argoverse tracking data from https://www.argoverse.org/data.html#tracking-link. Our models were trained on version 1.1, you will need to download the four training blobs, validation blob, and the HD map data.
+1. Download the Argoverse tracking data from https://www.argoverse.org/data.html#tracking-link. Our models were trained on version 1.1, you will need to download the four training blobs, validation blob, and the HD map data (place the maps inside of the Argoverse devkit folder - argoverse-api/map_files).
 2. Install the Argoverse devkit from https://github.com/argoai/argoverse-api
 3. Cd to `mono-semantic-maps`
 5. Edit the `configs/datasets/argoverse.yml` file, setting the `dataroot` and `label_root` entries to the location of the install Argoverse data and the desired ground truth folder respectively.
