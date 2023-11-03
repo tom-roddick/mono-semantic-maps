@@ -32,7 +32,7 @@ def render_polygon(mask, polygon, extents, resolution, value=1):
         return
     polygon = (polygon - np.array(extents[:2])) / resolution
     polygon = np.ascontiguousarray(polygon).round().astype(np.int32)
-    cv2.fillConvexPoly(mask, polygon, value)
+    cv2.fillPoly(mask, [polygon], value)
 
 
 def get_visible_mask(instrinsics, image_width, extents, resolution):
